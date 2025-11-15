@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Creator's Assistant - AI-Powered Prototyper</title>
+    <!-- 3. TECHNICAL SPECIFICATIONS: Tailwind CSS and Inter Font CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Tailwind Configuration for Light Mode & Font */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary-blue': '#4F46E5',      /* Indigo-700 accent */
+                        'bg-light': '#F3F4F6',          /* Gray-100 background */
+                        'card-light': '#FFFFFF',        /* White card surface */
+                        'border-light': '#D1D5DB',      /* Gray-300 border */
+                        'code-bg': '#111827',           /* Gray-900 for code blocks */
+                    }
+                }
+            }
+        }
+        /* Custom scrollbar for aesthetics */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #9CA3AF; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: #E5E7EB; }
+        /* Simple styling for output readability */
+        .prose h4 { color: #4F46E5; margin-top: 1.5rem; margin-bottom: 0.75rem; font-weight: 700; font-size: 1.25rem; }
+        .prose ul { list-style-type: disc; padding-left: 1.5em; margin-top: 0.5rem; }
+        .prose li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+
+<body class="bg-bg-light text-gray-900 font-sans min-h-screen p-4 sm:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- 1. SYSTEM ROLE AND GOAL: Application Header (Centered) -->
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-extrabold text-primary-blue">Creator's Assistant</h1>
+            <p class="text-gray-600 mt-1">AI-Powered Personal and Creative Automation </p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="border-b border-border-light mb-6">
+            <ul class="flex space-x-2 sm:space-x-4" id="tab-nav">
+                <li><button data-tab="idea" class="tab-button py-2 px-3 sm:px-4 text-sm font-medium text-gray-900 border-b-2 border-primary-blue active-tab transition duration-150 ease-in-out">1. Idea & Headline Generator</button></li>
+                <li><button data-tab="visual" class="tab-button py-2 px-3 sm:px-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-gray-400 transition duration-150 ease-in-out">2. Visual Asset Generator</button></li>
+                <li><button data-tab="code" class="tab-button py-2 px-3 sm:px-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-gray-400 transition duration-150 ease-in-out">3. Automation Script Generator</button></li>
+            </ul>
+        </nav>
+
+        <!-- Tab Content Containers -->
+        <div id="tab-content">
+            
+            <!-- 2. APPLICATION REQUIREMENTS: A. Core Module: Idea & Headline Generator (Gemini-based Text) -->
+            <div id="tab-idea" class="tab-pane">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Input Panel -->
+                    <div class="lg:col-span-1 p-6 bg-card-light rounded-xl shadow-lg border border-gray-200 h-min sticky top-8">
+                        <h2 class="text-xl font-semibold mb-4 text-primary-blue">Content Brainstorm</h2>
+                        <div class="mb-4">
+                            <label for="idea-topic" class="block text-sm font-medium text-gray-700 mb-2">Topic/Keywords (e.g., Sustainable Gardening)</label>
+                            <input type="text" id="idea-topic" value="AI-driven Marketing Strategies for Small Businesses" class="w-full p-3 border border-border-light rounded-lg bg-gray-50 text-gray-900 focus:ring-primary-blue focus:border-primary-blue placeholder-gray-500" placeholder="Enter topic keywords">
+                        </div>
+                        <button id="generate-idea-btn" class="w-full  mt-3 py-2 border border-green-500 text-green-500 rounded-lg text-white font-bold transition duration-150 ease-in-out disabled:opacity-50 flex items-center justify-center">
+                            <svg id="idea-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            Generate Ideas & Headlines
+                        </button>
+                        <button id="save-idea-btn" class="w-full mt-3 py-2 border border-green-500 text-green-500 hover:bg-green-50/50 rounded-lg font-medium transition duration-150 ease-in-out">
+                            Save Project Assets (Stub)
+                        </button>
+                        <div id="save-idea-status" class="text-sm mt-3 text-center text-green-600 hidden"></div>
+                    </div>
+                    
+                    <!-- Output Panel -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div id="idea-output" class="p-6 bg-card-light rounded-xl shadow-lg border border-gray-200 min-h-[300px] flex items-center justify-center text-gray-500">
+                            <p>10 Viral Social Media Hooks, 5 Blog Post Titles, and 1 Comprehensive Outline will appear here.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. APPLICATION REQUIREMENTS: B. Visual Asset Generator (Imagen/Flash-based Image) -->
+            <div id="tab-visual" class="tab-pane hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Input Panel -->
+                    <div class="lg:col-span-1 p-6 bg-card-light rounded-xl shadow-lg border border-gray-200 h-min sticky top-8">
+                        <h2 class="text-xl font-semibold mb-4 text-primary-blue">Image Generation (Imagen/Flash)</h2>
+                        <div class="mb-4">
+                            <label for="visual-prompt" class="block text-sm font-medium text-gray-700 mb-2">Detailed Visual Prompt</label>
+                            <textarea id="visual-prompt" rows="4" class="w-full p-3 border border-border-light rounded-lg bg-gray-50 text-gray-900 focus:ring-primary-blue focus:border-primary-blue placeholder-gray-500" placeholder="A minimalist, low-poly depiction of a spaceship flying over a purple planet, 16:9 ratio"></textarea>
+                        </div>
+                        <button id="generate-visual-btn" class="w-full py-3 bg-primary-blue hover:bg-indigo-600 rounded-lg text-white font-bold transition duration-150 ease-in-out disabled:opacity-50 flex items-center justify-center">
+                            <svg id="visual-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            Generate Visual Asset
+                        </button>
+                    </div>
+
+                    <!-- Output Panel -->
+                    <div class="lg:col-span-2">
+                        <div id="visual-output" class="p-6 bg-card-light rounded-xl shadow-lg border border-gray-200 min-h-[400px] flex items-center justify-center text-gray-500">
+                            <p>Your generated image asset (16:9) will appear here.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. APPLICATION REQUIREMENTS: C. Automation Script Generator (Gemini-based Code) -->
+            <div id="tab-code" class="tab-pane hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Input Panel -->
+                    <div class="lg:col-span-1 p-6 bg-card-light rounded-xl shadow-lg border border-gray-200 h-min sticky top-8">
+                        <h2 class="text-xl font-semibold mb-4 text-primary-blue">Code/Script Generation</h2>
+                        <div class="mb-4">
+                            <label for="code-request" class="block text-sm font-medium text-gray-700 mb-2">Script Request</label>
+                            <textarea id="code-request" rows="4" class="w-full p-3 border border-border-light rounded-lg bg-gray-50 text-gray-900 focus:ring-primary-blue focus:border-primary-blue placeholder-gray-500" placeholder="Python script to rename all JPEGs in a folder to lowercase"></textarea>
+                        </div>
+                        <button id="generate-code-btn" class="w-full py-3 bg-primary-blue hover:bg-indigo-600 rounded-lg text-white font-bold transition duration-150 ease-in-out disabled:opacity-50 flex items-center justify-center">
+                            <svg id="code-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            Generate Code Snippet
+                        </button>
+                    </div>
+
+                    <!-- Output Panel -->
+                    <div class="lg:col-span-2">
+                        <div id="code-output" class="p-6 bg-card-light rounded-xl shadow-lg border border-gray-200 min-h-[300px] flex items-center justify-center text-gray-500">
+                            <p>Generated code, encapsulated in a clearly visible, easy-to-copy block, will appear here.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. TECHNICAL SPECIFICATIONS: Vanilla JavaScript Logic -->
+    <script>
+        // ----------------------------------------------------
+        // GLOBAL SETUP AND CONSTANTS
+        // ----------------------------------------------------
+        const apiKey = "AIzaSyAF1ELX9u-02fRE764lF-PwY1YAYuGvxDk";
+        // Corrected base URL for public Generative Language API
+        const baseUrl = "https://generativelanguage.googleapis.com/v1beta/";
+
+        // DOM Elements
+        const tabNav = document.getElementById('tab-nav');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+
+        const ideaTopicInput = document.getElementById('idea-topic');
+        const generateIdeaBtn = document.getElementById('generate-idea-btn');
+        const ideaOutput = document.getElementById('idea-output');
+        const saveIdeaBtn = document.getElementById('save-idea-btn');
+        const saveIdeaStatus = document.getElementById('save-idea-status');
+        const ideaSpinner = document.getElementById('idea-spinner');
+
+        const visualPromptInput = document.getElementById('visual-prompt');
+        const generateVisualBtn = document.getElementById('generate-visual-btn');
+        const visualOutput = document.getElementById('visual-output');
+        const visualSpinner = document.getElementById('visual-spinner');
+
+        const codeRequestInput = document.getElementById('code-request');
+        const generateCodeBtn = document.getElementById('generate-code-btn');
+        const codeOutput = document.getElementById('code-output');
+        const codeSpinner = document.getElementById('code-spinner');
+
+        // Store original button text for reset
+        generateIdeaBtn.dataset.originalText = generateIdeaBtn.textContent.trim();
+        generateVisualBtn.dataset.originalText = generateVisualBtn.textContent.trim();
+        generateCodeBtn.dataset.originalText = generateCodeBtn.textContent.trim();
+
+
+        // ----------------------------------------------------
+        // API UTILITIES (Backoff and Response Parsing)
+        // ----------------------------------------------------
+
+        /**
+         * Executes a fetch request with exponential backoff for resilience.
+         * @param {string} url - The API endpoint URL.
+         * @param {object} options - The fetch options (method, headers, body).
+         * @param {number} maxRetries - Maximum number of retries.
+         * @returns {Promise<Response>} The successful fetch response.
+         */
+        async function exponentialBackoffFetch(url, options, maxRetries = 5) {
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response;
+                    }
+
+                    // Check for rate limit (429) or server error (5xx)
+                    if (response.status === 429 || response.status >= 500) {
+                        if (attempt < maxRetries - 1) {
+                            const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            // Continue loop for retry
+                        } else {
+                            throw new Error(`API failed after ${maxRetries} attempts with status ${response.status}`);
+                        }
+                    } else {
+                        // For non-retryable errors (e.g., 400 Bad Request, 401 Unauthorized)
+                        const errorBody = await response.text();
+                        throw new Error(`API error (${response.status}): ${errorBody}`);
+                    }
+                } catch (error) {
+                    if (attempt === maxRetries - 1) {
+                        throw error;
+                    }
+                    const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        /**
+         * Extracts the text content from a Gemini generateContent response object.
+         * @param {object} data - The JSON response from the API.
+         * @returns {string} The generated text.
+         */
+        function extractTextFromGeminiResponse(data) {
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Error: Could not extract text from model response.';
+        }
+
+        // ----------------------------------------------------
+        // API GENERATOR (Text and Image Logic)
+        // ----------------------------------------------------
+
+        /**
+         * Calls the appropriate Google Generative AI model based on the request.
+         * @param {string} model - The model name (e.g., gemini-2.5-flash-preview-09-2025 or imagen-4.0-generate-001).
+         * @param {string} prompt - The user's input prompt.
+         * @param {string|null} systemInstruction - Optional system instruction for Gemini models.
+         * @returns {Promise<string>} A promise that resolves with the generated content (text or image base64 URL).
+         */
+        async function generateApiCall(model, prompt, systemInstruction = null) {
+            const isImageModel = (model === 'imagen-4.0-generate-001');
+
+            if (isImageModel) {
+                // IMAGEN-4.0-GENERATE-001 (Predict endpoint)
+                const endpoint = `${baseUrl}models/${model}:predict?key=${apiKey}`;
+                const payload = {
+                    instances: [{ prompt: prompt }],
+                    parameters: {
+                        "sampleCount": 1,
+                        // Specify aspect ratio for 16:9 look
+                        "aspectRatio": "16:9" 
+                    }
+                };
+                
+                const response = await exponentialBackoffFetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+
+                const base64Data = data?.predictions?.[0]?.bytesBase64Encoded;
+                if (!base64Data) {
+                    throw new Error('Image generation failed or returned empty data.');
+                }
+                
+                // Return data URL directly
+                return `data:image/png;base64,${base64Data}`;
+
+            } else {
+                // GEMINI-2.5-FLASH-PREVIEW-09-2025 (generateContent endpoint)
+                const endpoint = `${baseUrl}models/${model}:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }] } : undefined,
+                };
+
+                const response = await exponentialBackoffFetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                return extractTextFromGeminiResponse(data);
+            }
+        }
+
+
+        // ----------------------------------------------------
+        // DATA MANAGEMENT STUBS (Using original stubs for save/load)
+        // ----------------------------------------------------
+
+        /**
+         * Simulates saving generated assets to a central repository (e.g., Firestore).
+         */
+        function saveProject(data) {
+            console.log('--- Project Save Stub ---');
+            console.log('Simulating saving the following data:', data);
+            
+            saveIdeaStatus.textContent = 'Saved Successfully!';
+            saveIdeaStatus.classList.remove('hidden');
+            
+            setTimeout(() => {
+                saveIdeaStatus.classList.add('hidden');
+            }, 3000);
+        }
+
+        /**
+         * Simulates loading previous projects.
+         */
+        async function loadProjects() {
+            console.log('--- Project Load Stub ---');
+            return []; 
+        }
+        
+        loadProjects(); // Execute load stub on initialization
+
+
+        // ----------------------------------------------------
+        // UI/EVENT HANDLERS
+        // ----------------------------------------------------
+
+        /** Handles tab switching */
+        function handleTabSwitch(event) {
+            if (!event.target.classList.contains('tab-button')) return;
+
+            const targetTab = event.target.dataset.tab;
+
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active-tab', 'text-gray-900', 'border-primary-blue');
+                btn.classList.add('text-gray-500', 'border-transparent', 'hover:border-gray-400');
+            });
+
+            event.target.classList.add('active-tab', 'text-gray-900', 'border-primary-blue');
+            event.target.classList.remove('text-gray-500', 'border-transparent', 'hover:border-gray-400');
+
+            tabPanes.forEach(pane => pane.classList.add('hidden'));
+
+            document.getElementById(`tab-${targetTab}`).classList.remove('hidden');
+        }
+
+        /** Manages the loading state of a button and spinner. */
+        function setLoading(btn, spinner, isLoading) {
+            btn.disabled = isLoading;
+            spinner.classList.toggle('hidden', !isLoading);
+            if (isLoading) {
+                 btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating...`;
+            } else {
+                 btn.innerHTML = btn.dataset.originalText;
+            }
+        }
+
+
+        // --- 1. Idea Generator Event Listener (Text Generation) ---
+        generateIdeaBtn.addEventListener('click', async () => {
+            const topic = ideaTopicInput.value.trim();
+            if (!topic) { 
+                // Using console.error instead of alert()
+                console.error("Please enter a topic/keywords.");
+                ideaOutput.innerHTML = '<p class="text-red-500">Please enter a topic/keywords to generate ideas.</p>'; 
+                return; 
+            }
+
+            setLoading(generateIdeaBtn, ideaSpinner, true);
+            ideaOutput.innerHTML = '<div class="text-center text-primary-blue mt-12 flex flex-col items-center justify-center"><svg class="animate-spin h-8 w-8 text-primary-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="mt-2">Running Gemini Flash for content brainstorm...</span></div>';
+
+            // Detailed prompt asking for structured HTML output
+            const prompt = `Based on the topic: "${topic}", generate the following content strictly in HTML list format (using <h4>, <ul>, and <li> tags): 1. A section titled "10 Viral Social Media Hooks" with 10 short, attention-grabbing phrases. 2. A section titled "5 SEO-Friendly Blog Post Titles" with 5 long-form titles. 3. A section titled "1 Comprehensive 5-Point Outline" with a 5-bullet summary for a long-form article.`;
+            const systemInstruction = "Act as a senior content strategist for a leading SaaS company. Provide creative, actionable content ideas ready for publication.";
+            
+            try {
+                const result = await generateApiCall('gemini-2.5-flash-preview-09-2025', prompt, systemInstruction);
+                ideaOutput.innerHTML = `<div class="prose max-w-none text-gray-900">${result}</div>`;
+                
+            } catch (error) {
+                console.error("Error in Idea Generation:", error);
+                ideaOutput.innerHTML = `<div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg"><strong>Generation Error:</strong> Failed to get a response. Please check the console for details.</div>`;
+            } finally {
+                setLoading(generateIdeaBtn, ideaSpinner, false);
+            }
+        });
+
+        // --- Save Project Stub Listener ---
+        saveIdeaBtn.addEventListener('click', () => {
+            const projectData = {
+                module: 'Idea & Headline Generator',
+                topic: ideaTopicInput.value.trim(),
+                content: ideaOutput.innerHTML,
+                timestamp: new Date().toISOString()
+            };
+            saveProject(projectData);
+        });
+
+
+        // --- 2. Visual Generator Event Listener (Image Generation) ---
+        generateVisualBtn.addEventListener('click', async () => {
+            const prompt = visualPromptInput.value.trim();
+            if (!prompt) { 
+                console.error("Please enter a detailed visual prompt.");
+                visualOutput.innerHTML = '<p class="text-red-500">Please enter a detailed visual prompt to generate an image.</p>'; 
+                return; 
+            }
+
+            setLoading(generateVisualBtn, visualSpinner, true);
+            visualOutput.innerHTML = '<div class="text-center text-primary-blue mt-12 flex flex-col items-center justify-center"><svg class="animate-spin h-8 w-8 text-primary-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="mt-2">Calling Imagen to create visual asset...</span></div>';
+
+            const fullPrompt = `${prompt}, digital art, highly detailed, suitable for a 16:9 blog header`;
+
+            try {
+                // This call returns a data:image/png;base64,... URL
+                const imageUrl = await generateApiCall('imagen-4.0-generate-001', fullPrompt); 
+                
+                visualOutput.innerHTML = `
+                    <div class="w-full h-full flex flex-col items-center p-2">
+                        <img src="${imageUrl}" alt="Generated Visual Asset for ${prompt}" class="rounded-xl shadow-2xl w-full object-cover border border-gray-300" style="aspect-ratio: 16 / 9; max-height: 500px;">
+                        <p class="text-xs text-gray-500 mt-4">Asset successfully generated by Imagen.</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error("Error in Visual Generation:", error);
+                visualOutput.innerHTML = `<div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg"><strong>Image Error:</strong> Failed to generate image. Please check the console for details.</div>`;
+            } finally {
+                setLoading(generateVisualBtn, visualSpinner, false);
+            }
+        });
+
+
+        // --- 3. Code Generator Event Listener (Code Generation) ---
+        generateCodeBtn.addEventListener('click', async () => {
+            const request = codeRequestInput.value.trim();
+            if (!request) { 
+                console.error("Please enter a script request."); 
+                codeOutput.innerHTML = '<p class="text-red-500">Please enter a script request to generate code.</p>'; 
+                return; 
+            }
+
+            setLoading(generateCodeBtn, codeSpinner, true);
+            codeOutput.innerHTML = '<div class="text-center text-primary-blue mt-12 flex flex-col items-center justify-center"><svg class="animate-spin h-8 w-8 text-primary-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="mt-2">Running Gemini Flash for code generation...</span></div>';
+
+            const prompt = `Generate a fully functional, well-commented code snippet for the following request, and **only** output the code block encapsulated in standard markdown triple backticks (\`\`\`language\ncode\n\`\`\`): Script request: ${request}`;
+            const systemInstruction = "You are a helpful, senior-level programming assistant. Always prioritize creating complete, functional, and well-commented code in the requested language.";
+
+            try {
+                const result = await generateApiCall('gemini-2.5-flash-preview-09-2025', prompt, systemInstruction);
+
+                // Simple regex to extract the markdown code block
+                const codeMatch = result.match(/```(\w+)?\n([\s\S]*?)```/);
+
+                if (codeMatch) {
+                    const language = codeMatch[1] || 'plaintext';
+                    const codeContent = codeMatch[2].trim();
+                    
+                    // Code block with copy button and syntax highlighting effect
+                    codeOutput.innerHTML = `
+                        <div class="bg-code-bg p-4 rounded-xl shadow-xl border border-gray-700 overflow-x-auto w-full">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-mono text-green-400 uppercase">${language}</span>
+                                <button onclick="copyCode(this)" class="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-xs text-gray-300 rounded transition duration-150 ease-in-out">
+                                    Copy Code
+                                </button>
+                            </div>
+                            <!-- Note: Using <pre> for structure, but escaping content to prevent HTML injection if the model returns unexpected tags. -->
+                            <pre class="whitespace-pre-wrap"><code id="generated-code" class="text-sm text-gray-200">${codeContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>
+                        </div>
+                    `;
+                } else {
+                    codeOutput.innerHTML = `<div class="text-yellow-700 p-4 border border-yellow-300 bg-yellow-50 rounded-lg">Model output was not in the expected \`\`\`code\`\`\` format. Raw output: ${result.substring(0, 500)}...</div>`;
+                }
+                
+            } catch (error) {
+                console.error("Error in Code Generation:", error);
+                codeOutput.innerHTML = `<div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg"><strong>Code Error:</strong> Failed to get a response. Please check the console for details.</div>`;
+            } finally {
+                setLoading(generateCodeBtn, codeSpinner, false);
+            }
+        });
+        
+        /** Utility function for copying code content */
+        function copyCode(buttonElement) {
+            const codeElement = document.getElementById('generated-code');
+            if (codeElement) {
+                // Use a temporary textarea for robust copying
+                const textarea = document.createElement('textarea');
+                textarea.value = codeElement.textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+
+                const originalText = buttonElement.textContent;
+                buttonElement.textContent = 'Copied!';
+                setTimeout(() => { buttonElement.textContent = originalText; }, 1500);
+            }
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            tabNav.addEventListener('click', handleTabSwitch);
+        });
+
+    </script>
+</body>
+</html>
